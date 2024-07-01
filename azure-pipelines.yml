@@ -121,7 +121,7 @@ stages:
               azureSubscription: 'Free Trial(3a373df8-1ae2-4620-8c66-0550ba56d571)'
               appType: 'webApp'
               WebAppName: 'infyweb'
-              package: '$(Pipeline.Workspace)/RetailApp/**/*.zip'
+              package: '$(Pipeline.Workspace)/RetailApp/**/ApplicationCore.zip'
 
         
         
