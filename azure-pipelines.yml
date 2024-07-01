@@ -34,11 +34,11 @@ stages:
           inputs:
             command: 'publish'
             publishWebProjects: true
-            arguments: '-o $(Build.ArtifactStagingDirectory)'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/ApplicationCore'
           displayName: 'Publish'
         - task: PublishPipelineArtifact@1
           inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)'
+            targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
             artifact: 'RetailApp'
           displayName: 'PublishArtifact'
             
