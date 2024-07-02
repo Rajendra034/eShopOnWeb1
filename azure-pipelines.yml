@@ -51,10 +51,16 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
-          - task: DownloadPipelineArtifact@2
+          # - task: DownloadPipelineArtifact@2
+          #   inputs:
+          #     artifact: 'RetailApp'
+          #     path: '$(Pipeline.Workspace)/RetailApp'
+          - task: DownloadBuildArtifacts@1
             inputs:
-              artifact: 'RetailApp'
-              path: '$(Pipeline.Workspace)/RetailApp'
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'RetailApp'
+              downloadPath: '$(Build.ArtifactStagingDirectory)'
 
           - task: AzureRmWebAppDeployment@4
             displayName: 'Deploy to Azure App Service'
@@ -63,7 +69,7 @@ stages:
               azureSubscription: 'Free Trial(1)(3a373df8-1ae2-4620-8c66-0550ba56d571)'
               appType: 'webApp'
               WebAppName: 'webinfy'
-              packageForLinux: '$(Pipeline.Workspace)/RetailApp/ApplicationCore.zip'
+              packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
 
         # - task: AzureRmWebAppDeployment@4
         #   inputs:
