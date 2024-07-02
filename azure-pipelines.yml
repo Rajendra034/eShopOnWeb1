@@ -3,83 +3,70 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-name: DotnetApp-CICD-Test
-trigger:
-- master
+name: EshopWeb
 
 stages:
-- stage: 'BuildStage'
-  jobs:
-  - job: 'BuildJob'
-    variables:
-      buildConfiguration: 'Release'
+  - stage: BuildStage
+    displayName: "BuildStage"
+    jobs:
+      - job: BuildJob
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore'
+            inputs:
+              command: 'restore'
+              projects: '**/ApplicationCore.csproj'
+              feedsToUse: 'select'
 
-    pool:
-      vmImage: 'windows-latest'
+          - task: DotNetCoreCLI@2
+            displayName: 'Build'
+            inputs:
+              command: 'build'
+              projects: '**/ApplicationCore.csproj'
 
-    steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'restore'
-        projects: '**/*.csproj'
-        feedsToUse: 'select'
-      displayName: 'Restore'
+          - task: DotNetCoreCLI@2
+            displayName: 'Unit Test'
+            inputs:
+              command: 'test'
+              projects: '**/UnitTests.csproj'
 
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'build'
-        projects: '**/ApplicationCore.csproj'
-      displayName: 'Build'
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish'
+            inputs:
+              command: 'publish'
+              publishWebProjects: true
+              arguments: '-o $(Build.ArtifactStagingDirectory)/ApplicationCore'
 
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'test'
-        projects: '**/UnitTests.csproj'
-      displayName: 'Unit-test'
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Artifact'
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
+              artifact: 'RetailApp'
 
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        projects: '**/ApplicationCore.csproj'
-        arguments: '-o $(Build.ArtifactStagingDirectory)'
-      displayName: 'Publish'
+  - stage: Deploy
+    jobs:
+      - job: DevEnv
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'RetailApp'
+              downloadPath: '$(Build.ArtifactStagingDirectory)/RetailApp'
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)'
-        artifact: 'RetailApp'
-      displayName: 'Publish Artifact'
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy to Azure App Service'
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Free Trial(1)(3a373df8-1ae2-4620-8c66-0550ba56d571)'
+              appType: 'webApp'
+              WebAppName: 'webinfy'
+              packageForLinux: '$(Build.ArtifactStagingDirectory)/RetailApp/**/*.zip'
 
-- stage: Deployment
-  displayName: 'webApp'
-
-  jobs:
-    - job: deploy
-      pool:
-        vmImage: 'windows-latest'
-      
-      steps:
-        - task: DownloadPipelineArtifact@2
-          inputs:
-            artifact: 'RetailApp'
-            targetPath: '$(Pipeline.Workspace)/RetailApp'
-          displayName: 'Download Artifact'
-        
-        - script: |
-            echo "Listing files in $(Pipeline.Workspace)/RetailApp:"
-            dir "$(Pipeline.Workspace)/RetailApp"
-          displayName: 'List files in RetailApp'
-
-
-        - task: AzureRmWebAppDeployment@4
-          inputs:
-            ConnectionType: 'AzureRM'
-            azureSubscription: 'Free Trial(3a373df8-1ae2-4620-8c66-0550ba56d571)'
-            appType: 'webApp'
-            WebAppName: 'webinfy'
-            package: '$(Pipeline.Workspace)/RetailApp/ApplicationCore.zip'
-          displayName: 'Azure Web App Deploy'
         # - task: AzureRmWebAppDeployment@4
         #   inputs:
         #       ConnectionType: 'AzureRM'
