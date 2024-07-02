@@ -188,12 +188,12 @@ stages:
 
           - script: |
               echo "Listing files in RetailApp directory:"
-              ls "$(Pipeline.Workspace)/RetailApp"
+              dir "$(Pipeline.Workspace)\RetailApp"
             displayName: 'List files in RetailApp'
 
           - script: |
-              echo "Listing files in $(Pipeline.Workspace)/RetailApp/ApplicationCore:"
-              ls "$(Pipeline.Workspace)/RetailApp/ApplicationCore"
+              echo "Listing files in $(Pipeline.Workspace)\RetailApp\ApplicationCore:"
+              dir "$(Pipeline.Workspace)\RetailApp\ApplicationCore"
             displayName: 'List files in ApplicationCore directory'
 
           - task: AzureRmWebAppDeployment@4
@@ -202,4 +202,4 @@ stages:
               azureSubscription: 'Free Trial(3a373df8-1ae2-4620-8c66-0550ba56d571)'
               appType: 'webApp'
               WebAppName: 'infyweb'
-              package: '$(Pipeline.Workspace)/RetailApp/ApplicationCore/ApplicationCore.zip'
+              package: '$(Pipeline.Workspace)\RetailApp\ApplicationCore\ApplicationCore.zip'
