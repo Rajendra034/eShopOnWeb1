@@ -17,20 +17,20 @@ stages:
             displayName: 'Restore'
             inputs:
               command: 'restore'
-              projects: '**/ApplicationCore.csproj'
+              projects: '**/ApplicationCore.sln'
               feedsToUse: 'select'
 
           - task: DotNetCoreCLI@2
             displayName: 'Build'
             inputs:
               command: 'build'
-              projects: '**/ApplicationCore.csproj'
+              projects: '**/ApplicationCore.sln'
 
           - task: DotNetCoreCLI@2
             displayName: 'Unit Test'
             inputs:
               command: 'test'
-              projects: '**/UnitTests.csproj'
+              projects: '**/UnitTests.sln'
 
           - task: DotNetCoreCLI@2
             displayName: 'Publish'
