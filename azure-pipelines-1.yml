@@ -61,7 +61,33 @@ stages:
               WebAppName: 'webinfy'
               packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
   
-  - stage: DeployinQA
+  - stage: Deploy_SIT1
+    dependsOn: Deploy
+    jobs:
+    - deployment: Deploy
+      environment: QA_ENV
+      pool:
+        vmImage: 'windows-latest'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: DownloadBuildArtifacts@1
+              inputs:
+                buildType: 'current'
+                downloadType: 'single'
+                artifactName: 'RetailApp'
+                downloadPath: '$(Build.ArtifactStagingDirectory)'
+              displayName: 'DownloadArtifact'
+            - task: AzureRmWebAppDeployment@4
+              inputs:
+                ConnectionType: 'AzureRM'
+                azureSubscription: 'Free Trial(1)(3a373df8-1ae2-4620-8c66-0550ba56d571)'
+                appType: 'webApp'
+                WebAppName: 'webinfy1'
+                packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
+  - stage: Deploy_SIT2
+    dependsOn: Deploy
     jobs:
     - deployment: Deploy
       environment: QA_ENV
