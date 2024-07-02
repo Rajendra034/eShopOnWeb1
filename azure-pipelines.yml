@@ -3,70 +3,70 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-name: EshopWeb
+# name: EshopWeb
 
-stages:
-  - stage: 'BuildStage'
-    displayName: "BuildStage"
-    jobs:
-      - job: 'BuildJob'
-        pool:
-          vmImage: 'windows-latest'
-        steps:
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'restore'
-            projects: '**/ApplicationCore.csproj'
-            feedsToUse: 'select'
-          displayName: 'restore'
+# stages:
+#   - stage: 'BuildStage'
+#     displayName: "BuildStage"
+#     jobs:
+#       - job: 'BuildJob'
+#         pool:
+#           vmImage: 'windows-latest'
+#         steps:
+#         - task: DotNetCoreCLI@2
+#           inputs:
+#             command: 'restore'
+#             projects: '**/ApplicationCore.csproj'
+#             feedsToUse: 'select'
+#           displayName: 'restore'
 
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'build'
-            projects: '**/ApplicationCore.csproj'
-          displayName: 'Build'
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'test'
-            projects: '**/UnitTests.csproj'
-          displayName: 'Unit-Test'
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'publish'
-            publishWebProjects: true
-            arguments: '-o $(Build.ArtifactStagingDirectory)/ApplicationCore'
-          displayName: 'Publish'
-        - task: PublishPipelineArtifact@1
-          inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
-            artifact: 'RetailApp'
-          displayName: 'PublishArtifact'
-        # - task: DownloadBuildArtifacts@1
-        #   inputs:
-        #     buildType: 'current'
-        #     downloadType: 'single'
-        #     artifactName: 'RetailApp'
-        #     downloadPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
+#         - task: DotNetCoreCLI@2
+#           inputs:
+#             command: 'build'
+#             projects: '**/ApplicationCore.csproj'
+#           displayName: 'Build'
+#         - task: DotNetCoreCLI@2
+#           inputs:
+#             command: 'test'
+#             projects: '**/UnitTests.csproj'
+#           displayName: 'Unit-Test'
+#         - task: DotNetCoreCLI@2
+#           inputs:
+#             command: 'publish'
+#             publishWebProjects: true
+#             arguments: '-o $(Build.ArtifactStagingDirectory)/ApplicationCore'
+#           displayName: 'Publish'
+#         - task: PublishPipelineArtifact@1
+#           inputs:
+#             targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
+#             artifact: 'RetailApp'
+#           displayName: 'PublishArtifact'
+#         # - task: DownloadBuildArtifacts@1
+#         #   inputs:
+#         #     buildType: 'current'
+#         #     downloadType: 'single'
+#         #     artifactName: 'RetailApp'
+#         #     downloadPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
             
-  - stage: Deploy
-    jobs:
-      - job: 'DevEnv'
-        pool:
-          vmImage: 'windows-latest'
-        steps:
-          - task: DownloadBuildArtifacts@1
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'RetailApp'
-              downloadPath: '$(Build.ArtifactStagingDirectory)/RetailApp'
-          - task: AzureRmWebAppDeployment@4
-            inputs:
-              ConnectionType: 'AzureRM'
-              azureSubscription: 'Free Trial(3a373df8-1ae2-4620-8c66-0550ba56d571)'
-              appType: 'webApp'
-              WebAppName: 'infyweb'
-              packageForLinux: '$(Build.ArtifactStagingDirectory)/RetailApp/ApplicationCore.zip'
+#   - stage: Deploy
+#     jobs:
+#       - job: 'DevEnv'
+#         pool:
+#           vmImage: 'windows-latest'
+#         steps:
+#           - task: DownloadBuildArtifacts@1
+#             inputs:
+#               buildType: 'current'
+#               downloadType: 'single'
+#               artifactName: 'RetailApp'
+#               downloadPath: '$(Build.ArtifactStagingDirectory)/RetailApp'
+#           - task: AzureRmWebAppDeployment@4
+#             inputs:
+#               ConnectionType: 'AzureRM'
+#               azureSubscription: 'Free Trial(3a373df8-1ae2-4620-8c66-0550ba56d571)'
+#               appType: 'webApp'
+#               WebAppName: 'infyweb'
+#               packageForLinux: '$(Build.ArtifactStagingDirectory)/RetailApp/ApplicationCore.zip'
 
 # name: EshopWeb
 
@@ -130,3 +130,76 @@ stages:
 #               package: '$(Pipeline.Workspace)/RetailApp/**/ApplicationCore.zip'
 
         
+
+
+name: EshopWeb
+
+stages:
+  - stage: 'BuildStage'
+    displayName: "BuildStage"
+    jobs:
+      - job: 'BuildJob'
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'restore'
+            projects: '**/ApplicationCore.csproj'
+            feedsToUse: 'select'
+          displayName: 'Restore'
+
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: '**/ApplicationCore.csproj'
+          displayName: 'Build'
+
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: '**/UnitTests.csproj'
+          displayName: 'Unit-Test'
+
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'publish'
+            publishWebProjects: true
+            arguments: '-o $(Build.ArtifactStagingDirectory)/ApplicationCore'
+          displayName: 'Publish'
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
+            artifact: 'RetailApp'
+          displayName: 'PublishArtifact'
+            
+  - stage: Deploy
+    displayName: 'DeployStage'
+    jobs:
+      - job: 'DevEnv'
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifact: 'RetailApp'
+              path: '$(Pipeline.Workspace)/RetailApp'
+
+          - script: |
+              echo "Listing files in RetailApp directory:"
+              ls "$(Pipeline.Workspace)/RetailApp"
+            displayName: 'List files in RetailApp'
+
+          - script: |
+              echo "Listing files in $(Pipeline.Workspace)/RetailApp/ApplicationCore:"
+              ls "$(Pipeline.Workspace)/RetailApp/ApplicationCore"
+            displayName: 'List files in ApplicationCore directory'
+
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Free Trial(3a373df8-1ae2-4620-8c66-0550ba56d571)'
+              appType: 'webApp'
+              WebAppName: 'infyweb'
+              package: '$(Pipeline.Workspace)/RetailApp/ApplicationCore/ApplicationCore.zip'
