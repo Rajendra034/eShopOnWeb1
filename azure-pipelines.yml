@@ -191,10 +191,10 @@ stages:
               dir "$(Pipeline.Workspace)\RetailApp"
             displayName: 'List files in RetailApp'
 
-          - script: |
-              echo "Listing files in $(Pipeline.Workspace)\RetailApp\ApplicationCore:"
-              dir "$(Pipeline.Workspace)\RetailApp\ApplicationCore"
-            displayName: 'List files in ApplicationCore directory'
+          # - script: |
+          #     echo "Listing files in $(Pipeline.Workspace)\RetailApp\ApplicationCore:"
+          #     dir "$(Pipeline.Workspace)\RetailApp\ApplicationCore"
+          #   displayName: 'List files in ApplicationCore directory'
 
           - task: AzureRmWebAppDeployment@4
             inputs:
