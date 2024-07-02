@@ -1,0 +1,62 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: EshopWeb
+stages:
+  - stage: 'BuildStage'
+    displayName: 'Build'
+    jobs:
+      - job: 'BuildJob'
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'restore'
+              projects: '**/*sln'
+              feedsToUse: 'select'
+            displayName: 'restore'
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'build'
+              projects: '**/*sln'
+            displayName: 'Build'
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'test'
+              projects: '**/*sln'
+            displayName: 'Unit-Test'
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'publish'
+              publishWebProjects: true
+              arguments: '-o $(Build.ArtifactStagingDirectory)'
+            displayName: 'Publish'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'RetailApp'
+            displayName: 'PublishArtifact'
+            
+  - stage: Deploy
+    jobs:
+      - job: 'Dev-Env'
+        pool:
+          vmImage:'windows-latest'
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'RetailApp'
+              downloadPath: '$(Build.ArtifactStagingDirectory)'
+            displayName: 'DownloadArtifact'
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Free Trial(1)(3a373df8-1ae2-4620-8c66-0550ba56d571)'
+              appType: 'webApp'
+              WebAppName: 'webinfy'
+              packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
