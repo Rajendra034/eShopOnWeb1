@@ -36,17 +36,17 @@ stages:
             publishWebProjects: true
             arguments: '-o $(Build.ArtifactStagingDirectory)/ApplicationCore'
           displayName: 'Publish'
-        # - task: PublishPipelineArtifact@1
-        #   inputs:
-        #     targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
-        #     artifact: 'RetailApp'
-        #   displayName: 'PublishArtifact'
-        - task: DownloadBuildArtifacts@1
+        - task: PublishPipelineArtifact@1
           inputs:
-            buildType: 'current'
-            downloadType: 'single'
-            artifactName: 'RetailApp'
-            downloadPath: '$(Build.ArtifactStagingDirectory)'
+            targetPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
+            artifact: 'RetailApp'
+          displayName: 'PublishArtifact'
+        # - task: DownloadBuildArtifacts@1
+        #   inputs:
+        #     buildType: 'current'
+        #     downloadType: 'single'
+        #     artifactName: 'RetailApp'
+        #     downloadPath: '$(Build.ArtifactStagingDirectory)/ApplicationCore'
             
   - stage: Deploy
     jobs:
