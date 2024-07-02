@@ -69,7 +69,7 @@ stages:
         - script: |
             echo "Listing files in $(Pipeline.Workspace)/RetailApp:"
             dir "$(Pipeline.Workspace)/RetailApp"
-            displayName: 'List files in RetailApp'
+          displayName: 'List files in RetailApp'
 
 
         - task: AzureRmWebAppDeployment@4
